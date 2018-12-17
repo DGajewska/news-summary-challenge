@@ -4,18 +4,18 @@ var mykey = config.MY_KEY;
   function NewsList(){
     this.newsData;
     this.stories = [];
+    this.htmlCode;
   }
 
   NewsList.prototype.getHTML = function(testData) {
     if (testData === undefined){
-      getNewsData(this);
+      return getNewsData(this, createsNewsStories);
     } else {
       this.newsData = testData;
     }
-    return createHTMLString(this.stories);
   };
 
-  function getNewsData(newsList) {
+  function getNewsData(newsList, callback) {
     var request = new XMLHttpRequest();
     url = 'https://content.guardianapis.com/search?api-key=' + mykey + '&show-fields=thumbnail';
     request.open('GET', url, true);
@@ -23,7 +23,7 @@ var mykey = config.MY_KEY;
     request.onload = function() {
       if (request.status >= 200 && request.status < 400) {
       newsList.newsData = JSON.parse(request.responseText).response.results;
-      createsNewsStories(newsList);
+      displayHTMLCode(callback(newsList));
       }
     };
     request.onerror = function() {
@@ -37,19 +37,23 @@ var mykey = config.MY_KEY;
       for(var i=0;i<newsList.newsData.length;i++){
         newsList.stories.push(new NewsStory(newsList.newsData[i]));
       }
+      return createHTMLString(newsList.stories);
     }
+
 
     function createHTMLString(stories){
       htmlString = "";
       for(var i=0;i<stories.length;i++){
         htmlString += "<div name=\"newsStory\"><img src=\"" + stories[i].photo
-          + "\"><a href=\"" + stories[i].url + "\">" + stories[i].headline
+          + "\"><br><a href=\"" + stories[i].url + "\">" + stories[i].headline
           + "</a></div>"
       }
       return htmlString;
     }
 
+    function displayHTMLCode(htmlCode){
+      document.getElementById('newsfeed').innerHTML = htmlCode;
+    }
+
   exports.NewsList = NewsList;
 })(this);
-
-var news = new NewsList();

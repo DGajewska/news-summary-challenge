@@ -6,7 +6,7 @@
   Newsfeed.prototype.loadNewsStories = function () {
     newsList = this.newsInFeed;
     document.addEventListener("DOMContentLoaded", function(){
-      document.getElementById('newsfeed').innerHTML = newsList.getHTML();
+      newsList.getHTML();
     });
   };
 
